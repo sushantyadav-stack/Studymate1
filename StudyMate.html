@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>StudyMate</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg: #0f0e17;
+  --surface: #1a1928;
+  --card: #222136;
+  --border: #2e2d45;
+  --primary: #ff6b35;
+  --primary-soft: rgba(255,107,53,0.15);
+  --secondary: #3dd6f5;
+  --secondary-soft: rgba(61,214,245,0.12);
+  --green: #2ecc71;
+  --green-soft: rgba(46,204,113,0.12);
+  --gold: #f5c842;
+  --gold-soft: rgba(245,200,66,0.12);
+  --pink: #ff4fa3;
+  --text: #f0eeff;
+  --text2: #9998bb;
+  --text3: #5f5e80;
+  --radius: 18px;
+  --radius-sm: 12px;
+  --nav-h: 70px;
+  --topbar-h: 60px;
+}
+.light {
+  --bg: #f5f4ff;
+  --surface: #eeedf8;
+  --card: #ffffff;
+  --border: #dddcf0;
+  --text: #1a1928;
+  --text2: #5a597a;
+  --text3: #9998bb;
+  --primary-soft: rgba(255,107,53,0.1);
+  --secondary-soft: rgba(61,214,245,0.1);
+  --green-soft: rgba(46,204,113,0.1);
+  --gold-soft: rgba(245,200,66,0.1);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:#000;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;}
+body{background:radial-gradient(ellipse at 50% 0%,#1a0533,#000 70%);}
+
+.phone{
+  width:100%;max-width:420px;height:100vh;max-height:900px;
+  background:var(--bg);border-radius:40px;overflow:hidden;
+  display:flex;flex-direction:column;position:relative;
+  box-shadow:0 40px 120px rgba(0,0,0,.8),0 0 0 1px rgba(255,255,255,.06);
+  transition:background .3s;
+}
+@media(max-width:440px){.phone{border-radius:0;max-height:100vh;}}
+
+/* Status bar */
+.statusbar{height:34px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;background:var(--bg);z-index:10;flex-shrink:0;}
+.statusbar span{font-size:12px;font-weight:700;color:var(--text2);}
+.statusbar-icons{display:flex;gap:5px;align-items:center;}
+.statusbar-icons svg{width:14px;height:14px;fill:var(--text2);}
+
+/* Top bar */
+.topbar{height:var(--topbar-h);display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;flex-shrink:0;background:var(--bg);z-index:9;}
+.topbar-title{font-size:20px;font-weight:900;color:var(--text);}
+.topbar-title span{color:var(--primary);}
+.topbar-actions{display:flex;gap:8px;}
+.icon-btn{width:38px;height:38px;border-radius:50%;background:var(--card);border:none;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:16px;
+  transition:all .2s;}
+.icon-btn:hover{background:var(--border);}
+
+/* Content */
+.content{flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:calc(var(--nav-h)+10px);}
+.content::-webkit-scrollbar{display:none;}
+
+/* Bottom nav */
+.bottom-nav{height:var(--nav-h);background:var(--surface);border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-around;padding:0 8px 8px;flex-shrink:0;
+  position:relative;z-index:10;}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:8px 14px;border-radius:14px;cursor:pointer;transition:all .2s;border:none;background:none;}
+.nav-item .nav-icon{font-size:22px;line-height:1;transition:transform .2s;}
+.nav-item .nav-label{font-size:10px;font-weight:700;color:var(--text3);transition:color .2s;}
+.nav-item.active{background:var(--primary-soft);}
+.nav-item.active .nav-icon{transform:scale(1.15);}
+.nav-item.active .nav-label{color:var(--primary);}
+
+/* Page */
+.page{padding:0 16px;animation:fadeUp .25s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.section-title{font-size:13px;font-weight:800;color:var(--text3);text-transform:uppercase;
+  letter-spacing:1px;margin:20px 0 10px;}
+
+/* Cards */
+.card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px;
+  border:1px solid var(--border);transition:transform .15s,box-shadow .15s;}
+.card:active{transform:scale(.98);}
+
+/* XP Bar card */
+.xp-card{background:linear-gradient(135deg,#1f1e35,#2a1f45);border:1px solid rgba(255,107,53,.2);
+  border-radius:var(--radius);padding:18px;margin:0 0 14px;}
+.xp-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.level-badge{background:var(--primary);color:#fff;font-weight:900;font-size:12px;
+  padding:4px 10px;border-radius:20px;}
+.xp-label{font-size:12px;color:var(--text2);}
+.xp-name{font-size:18px;font-weight:900;color:var(--text);}
+.xp-bar-bg{background:var(--border);border-radius:10px;height:8px;margin-top:10px;overflow:hidden;}
+.xp-bar-fill{background:linear-gradient(90deg,var(--primary),var(--pink));height:100%;
+  border-radius:10px;transition:width .6s cubic-bezier(.34,1.56,.64,1);}
+.xp-nums{display:flex;justify-content:space-between;margin-top:6px;}
+.xp-nums span{font-size:11px;color:var(--text3);font-weight:700;}
+
+/* Stats row */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+.stat-card{background:var(--card);border-radius:var(--radius-sm);padding:14px 10px;text-align:center;
+  border:1px solid var(--border);}
+.stat-icon{font-size:22px;margin-bottom:4px;}
+.stat-value{font-size:20px;font-weight:900;color:var(--text);}
+.stat-label{font-size:10px;color:var(--text3);font-weight:700;margin-top:1px;}
+
+/* Quote card */
+.quote-card{background:linear-gradient(135deg,#1a2e3b,#1a1928);border:1px solid rgba(61,214,245,.2);
+  border-radius:var(--radius);padding:16px;margin-bottom:14px;}
+.quote-text{font-size:14px;color:var(--text2);line-height:1.6;font-style:italic;}
+.quote-author{font-size:12px;color:var(--secondary);font-weight:700;margin-top:8px;}
+
+/* Challenge card */
+.challenge-card{background:var(--card);border-radius:var(--radius-sm);padding:14px;
+  border:1px solid var(--border);margin-bottom:10px;display:flex;align-items:center;gap:12px;}
+.challenge-icon{font-size:28px;flex-shrink:0;}
+.challenge-info{flex:1;}
+.challenge-name{font-size:14px;font-weight:800;color:var(--text);}
+.challenge-desc{font-size:12px;color:var(--text3);margin-top:2px;}
+.challenge-prog{height:5px;background:var(--border);border-radius:10px;margin-top:8px;overflow:hidden;}
+.challenge-prog-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,var(--primary),var(--gold));
+  transition:width .4s ease;}
+.challenge-xp{font-size:11px;font-weight:800;color:var(--gold);background:var(--gold-soft);
+  padding:3px 8px;border-radius:20px;flex-shrink:0;}
+.challenge-done{background:var(--green-soft);border-color:rgba(46,204,113,.2);}
+.challenge-done .challenge-prog-fill{background:var(--green);}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 20px;border-radius:14px;border:none;cursor:pointer;font-family:'Nunito',sans-serif;
+  font-weight:800;font-size:15px;transition:all .2s;width:100%;}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--primary);color:#fff;box-shadow:0 6px 20px rgba(255,107,53,.3);}
+.btn-primary:hover{box-shadow:0 8px 25px rgba(255,107,53,.4);}
+.btn-secondary{background:var(--secondary-soft);color:var(--secondary);border:1px solid rgba(61,214,245,.2);}
+.btn-ghost{background:var(--card);color:var(--text2);border:1px solid var(--border);}
+.btn-green{background:var(--green);color:#fff;box-shadow:0 6px 20px rgba(46,204,113,.25);}
+.btn-sm{padding:8px 14px;font-size:13px;border-radius:10px;width:auto;}
+.btn-danger{background:rgba(255,80,80,.15);color:#ff5050;border:1px solid rgba(255,80,80,.2);}
+
+/* FAB */
+.fab{position:fixed;bottom:calc(var(--nav-h) + 16px);right:16px;width:52px;height:52px;
+  background:var(--primary);border-radius:50%;border:none;cursor:pointer;font-size:22px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 6px 20px rgba(255,107,53,.4);color:#fff;transition:all .2s;z-index:20;}
+.fab:active{transform:scale(.92);}
+
+/* Flashcard flip */
+.flashcard-scene{width:100%;height:200px;perspective:800px;cursor:pointer;margin-bottom:16px;}
+.flashcard-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;
+  transition:transform .5s cubic-bezier(.4,0,.2,1);}
+.flashcard-inner.flipped{transform:rotateY(180deg);}
+.flashcard-face{position:absolute;inset:0;background:linear-gradient(135deg,#1f1e35,#2a1f45);
+  border:1px solid rgba(255,107,53,.2);border-radius:var(--radius);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  backface-visibility:hidden;padding:24px;text-align:center;}
+.flashcard-back{transform:rotateY(180deg);background:linear-gradient(135deg,#1a2e3b,#1a1928);
+  border-color:rgba(61,214,245,.2);}
+.flashcard-label{font-size:11px;font-weight:800;color:var(--text3);text-transform:uppercase;
+  letter-spacing:1px;margin-bottom:10px;}
+.flashcard-text{font-size:18px;font-weight:700;color:var(--text);line-height:1.5;}
+.flashcard-hint{font-size:12px;color:var(--text3);margin-top:12px;}
+
+/* Deck item */
+.deck-item{display:flex;align-items:center;gap:14px;background:var(--card);
+  border-radius:var(--radius-sm);padding:14px;margin-bottom:10px;border:1px solid var(--border);
+  cursor:pointer;transition:all .2s;}
+.deck-item:active{transform:scale(.98);}
+.deck-emoji{font-size:32px;width:48px;height:48px;background:var(--surface);border-radius:12px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.deck-info{flex:1;}
+.deck-name{font-size:15px;font-weight:800;color:var(--text);}
+.deck-count{font-size:12px;color:var(--text3);margin-top:2px;}
+.deck-arrow{color:var(--text3);font-size:18px;}
+
+/* Note item */
+.note-item{background:var(--card);border-radius:var(--radius-sm);padding:14px;
+  margin-bottom:10px;border:1px solid var(--border);cursor:pointer;transition:all .2s;}
+.note-item:active{transform:scale(.98);}
+.note-title{font-size:15px;font-weight:800;color:var(--text);}
+.note-preview{font-size:13px;color:var(--text3);margin-top:4px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.note-meta{display:flex;align-items:center;gap:8px;margin-top:8px;}
+.tag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;
+  background:var(--primary-soft);color:var(--primary);}
+.tag.blue{background:var(--secondary-soft);color:var(--secondary);}
+.tag.green{background:var(--green-soft);color:var(--green);}
+.note-date{font-size:11px;color:var(--text3);}
+
+/* Homework */
+.hw-item{display:flex;align-items:center;gap:12px;background:var(--card);
+  border-radius:var(--radius-sm);padding:14px;margin-bottom:10px;border:1px solid var(--border);}
+.hw-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);
+  cursor:pointer;transition:all .2s;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.hw-check.done{background:var(--green);border-color:var(--green);color:#fff;font-size:12px;}
+.hw-info{flex:1;}
+.hw-title{font-size:14px;font-weight:700;color:var(--text);transition:all .2s;}
+.hw-title.done{text-decoration:line-through;color:var(--text3);}
+.hw-due{font-size:11px;color:var(--text3);margin-top:2px;}
+.hw-due.overdue{color:#ff5050;}
+.hw-del{background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:4px;}
+
+/* Timer */
+.timer-display{text-align:center;padding:30px 20px;}
+.timer-mode{font-size:13px;font-weight:800;color:var(--text3);text-transform:uppercase;
+  letter-spacing:2px;margin-bottom:16px;}
+.timer-circle-wrapper{position:relative;width:220px;height:220px;margin:0 auto 24px;}
+.timer-svg{transform:rotate(-90deg);}
+.timer-track{fill:none;stroke:var(--border);stroke-width:8;}
+.timer-progress{fill:none;stroke:var(--primary);stroke-width:8;stroke-linecap:round;
+  transition:stroke-dashoffset .5s linear;stroke-dasharray:628;stroke-dashoffset:0;}
+.timer-time{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-size:48px;font-weight:900;color:var(--text);letter-spacing:-2px;}
+.timer-session{font-size:12px;color:var(--text3);position:absolute;bottom:20px;
+  left:50%;transform:translateX(-50%);}
+.timer-controls{display:flex;gap:12px;justify-content:center;margin-bottom:20px;}
+.timer-btn{width:60px;height:60px;border-radius:50%;border:none;cursor:pointer;
+  font-size:22px;transition:all .2s;}
+.timer-btn:active{transform:scale(.92);}
+.timer-play{background:var(--primary);color:#fff;box-shadow:0 6px 20px rgba(255,107,53,.35);}
+.timer-stop{background:var(--card);color:var(--text2);border:1px solid var(--border);}
+.timer-modes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
+.mode-btn{padding:10px;border-radius:12px;border:1px solid var(--border);background:var(--card);
+  cursor:pointer;text-align:center;transition:all .2s;}
+.mode-btn.active{background:var(--primary-soft);border-color:var(--primary);}
+.mode-btn-label{font-size:11px;font-weight:800;color:var(--text3);}
+.mode-btn.active .mode-btn-label{color:var(--primary);}
+.mode-btn-time{font-size:18px;font-weight:900;color:var(--text);}
+.session-log{background:var(--card);border-radius:var(--radius-sm);padding:14px;
+  border:1px solid var(--border);}
+.session-log-title{font-size:13px;font-weight:800;color:var(--text3);margin-bottom:10px;
+  text-transform:uppercase;letter-spacing:1px;}
+.session-item{display:flex;justify-content:space-between;align-items:center;
+  padding:8px 0;border-bottom:1px solid var(--border);}
+.session-item:last-child{border:none;}
+.session-name{font-size:13px;color:var(--text);font-weight:600;}
+.session-time{font-size:12px;color:var(--text3);}
+.session-xp{font-size:11px;font-weight:800;color:var(--gold);}
+
+/* Profile */
+.profile-header{text-align:center;padding:20px 0 10px;}
+.avatar-big{font-size:64px;width:90px;height:90px;background:var(--card);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;margin:0 auto 12px;
+  border:3px solid var(--primary);}
+.profile-name{font-size:22px;font-weight:900;color:var(--text);}
+.profile-sub{font-size:13px;color:var(--text3);margin-top:4px;}
+
+/* Badges */
+.badges-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+.badge-item{background:var(--card);border-radius:var(--radius-sm);padding:12px 8px;
+  text-align:center;border:1px solid var(--border);transition:all .2s;}
+.badge-item.earned{border-color:var(--gold);background:var(--gold-soft);}
+.badge-emoji{font-size:28px;margin-bottom:4px;display:block;}
+.badge-name{font-size:10px;font-weight:800;color:var(--text3);}
+.badge-item.earned .badge-name{color:var(--gold);}
+.badge-item.locked .badge-emoji{filter:grayscale(1);opacity:.4;}
+
+/* Settings */
+.setting-row{display:flex;align-items:center;justify-content:space-between;
+  background:var(--card);border-radius:var(--radius-sm);padding:14px 16px;
+  margin-bottom:10px;border:1px solid var(--border);}
+.setting-label{font-size:14px;font-weight:700;color:var(--text);}
+.setting-sub{font-size:12px;color:var(--text3);margin-top:2px;}
+.toggle{width:46px;height:26px;background:var(--border);border-radius:20px;cursor:pointer;
+  position:relative;transition:background .2s;border:none;flex-shrink:0;}
+.toggle.on{background:var(--primary);}
+.toggle::after{content:'';position:absolute;width:20px;height:20px;background:#fff;
+  border-radius:50%;top:3px;left:3px;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.3);}
+.toggle.on::after{left:23px;}
+
+/* Modal */
+.modal-overlay{position:absolute;inset:0;background:rgba(0,0,0,.6);z-index:100;
+  display:flex;align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(4px);animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.modal{background:var(--surface);border-radius:24px 24px 0 0;width:100%;
+  padding:20px;max-height:85%;overflow-y:auto;animation:slideUp .25s ease;}
+@keyframes slideUp{from{transform:translateY(30px);}to{transform:translateY(0);}}
+.modal::-webkit-scrollbar{display:none;}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:4px;
+  margin:0 auto 18px;}
+.modal-title{font-size:18px;font-weight:900;color:var(--text);margin-bottom:16px;}
+
+/* Input */
+.input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:13px 14px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;
+  color:var(--text);outline:none;transition:border .2s;margin-bottom:12px;}
+.input:focus{border-color:var(--primary);}
+.input::placeholder{color:var(--text3);}
+textarea.input{resize:vertical;min-height:100px;}
+
+/* Quiz */
+.quiz-question{font-size:17px;font-weight:800;color:var(--text);line-height:1.5;margin-bottom:20px;}
+.quiz-option{background:var(--card);border:1.5px solid var(--border);border-radius:14px;
+  padding:14px;margin-bottom:10px;cursor:pointer;transition:all .2s;
+  font-size:14px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:10px;}
+.quiz-option:active{transform:scale(.98);}
+.quiz-option.correct{background:var(--green-soft);border-color:var(--green);color:var(--green);}
+.quiz-option.wrong{background:rgba(255,80,80,.12);border-color:#ff5050;color:#ff5050;}
+.quiz-option-letter{width:28px;height:28px;border-radius:50%;background:var(--border);
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;}
+.quiz-progress{height:5px;background:var(--border);border-radius:10px;margin-bottom:16px;overflow:hidden;}
+.quiz-progress-fill{height:100%;background:var(--primary);border-radius:10px;transition:width .3s;}
+.quiz-counter{font-size:12px;color:var(--text3);font-weight:700;margin-bottom:20px;}
+.quiz-result{text-align:center;padding:20px 0;}
+.quiz-score{font-size:56px;font-weight:900;color:var(--primary);}
+.quiz-grade{font-size:18px;font-weight:800;color:var(--text);margin:8px 0;}
+.quiz-detail{font-size:14px;color:var(--text3);}
+
+/* Progress tab */
+.chart-card{background:var(--card);border-radius:var(--radius);padding:16px;
+  margin-bottom:12px;border:1px solid var(--border);}
+.chart-title{font-size:14px;font-weight:800;color:var(--text);margin-bottom:14px;}
+
+/* Streak calendar */
+.streak-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
+.streak-dot{width:32px;height:32px;border-radius:8px;background:var(--border);
+  display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text3);font-weight:700;}
+.streak-dot.active{background:var(--primary);color:#fff;}
+.streak-dot.today{background:var(--primary);color:#fff;box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--primary);}
+
+/* Toast */
+.toast{position:absolute;bottom:calc(var(--nav-h)+12px);left:50%;transform:translateX(-50%);
+  background:#222136;border:1px solid var(--border);border-radius:12px;
+  padding:10px 18px;font-size:13px;font-weight:700;color:var(--text);
+  white-space:nowrap;z-index:200;animation:toastIn .3s ease;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px);}
+  to{opacity:1;transform:translateX(-50%) translateY(0);}}
+
+/* Exam countdown */
+.exam-card{background:linear-gradient(135deg,#1f2035,#2a1f45);border:1px solid rgba(255,107,53,.2);
+  border-radius:var(--radius);padding:16px;margin-bottom:10px;}
+.exam-name{font-size:15px;font-weight:800;color:var(--text);}
+.exam-date{font-size:12px;color:var(--text3);margin-top:2px;}
+.exam-days{font-size:32px;font-weight:900;color:var(--primary);margin:8px 0 4px;}
+.exam-days-label{font-size:12px;color:var(--text3);}
+
+/* Empty state */
+.empty{text-align:center;padding:40px 20px;color:var(--text3);}
+.empty-icon{font-size:52px;margin-bottom:12px;}
+.empty-text{font-size:15px;font-weight:700;color:var(--text2);}
+.empty-sub{font-size:13px;margin-top:6px;}
+
+.color-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;}
+.color-swatch{width:32px;height:32px;border-radius:50%;cursor:pointer;transition:transform .2s;border:2px solid transparent;}
+.color-swatch.selected{transform:scale(1.2);border-color:#fff;}
+
+.search-bar{display:flex;align-items:center;gap:10px;background:var(--card);
+  border:1px solid var(--border);border-radius:14px;padding:10px 14px;margin-bottom:14px;}
+.search-bar input{flex:1;background:none;border:none;outline:none;font-family:'Nunito',sans-serif;
+  font-size:14px;font-weight:600;color:var(--text);}
+.search-bar input::placeholder{color:var(--text3);}
+
+.divider{height:1px;background:var(--border);margin:12px 0;}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.chip{padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;
+  border:1px solid var(--border);color:var(--text3);background:var(--card);transition:all .2s;}
+.chip.active{background:var(--primary-soft);border-color:var(--primary);color:var(--primary);}
+
+.tips-list .tip-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.tips-list .tip-item:last-child{border:none;}
+.tip-num{width:26px;height:26px;border-radius:50%;background:var(--primary-soft);color:var(--primary);
+  font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tip-text{font-size:13px;color:var(--text2);line-height:1.5;font-weight:600;}
+</style>
+</head>
+<body>
+<div class="phone" id="app">
+  <div class="statusbar">
+    <span id="clock">9:41</span>
+    <div class="statusbar-icons">
+      <svg viewBox="0 0 24 24"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+      <svg viewBox="0 0 24 24"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+    </div>
+  </div>
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Study<span>Mate</span></div>
+    <div class="topbar-actions" id="topbar-actions">
+      <button class="icon-btn" onclick="openSearch()">🔍</button>
+      <button class="icon-btn" onclick="toggleTheme()">🌙</button>
+    </div>
+  </div>
+  <div class="content" id="content"></div>
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="navigate('home')" id="nav-home">
+      <span class="nav-icon">🏠</span><span class="nav-label">Home</span>
+    </button>
+    <button class="nav-item" onclick="navigate('cards')" id="nav-cards">
+      <span class="nav-icon">📚</span><span class="nav-label">Cards</span>
+    </button>
+    <button class="nav-item" onclick="navigate('notes')" id="nav-notes">
+      <span class="nav-icon">📝</span><span class="nav-label">Notes</span>
+    </button>
+    <button class="nav-item" onclick="navigate('timer')" id="nav-timer">
+      <span class="nav-icon">⏱️</span><span class="nav-label">Timer</span>
+    </button>
+    <button class="nav-item" onclick="navigate('me')" id="nav-me">
+      <span class="nav-icon">👤</span><span class="nav-label">Me</span>
+    </button>
+  </nav>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════
+const LEVELS = [0,100,250,450,700,1000,1400,1900,2500,3200,4000];
+const LEVEL_NAMES = ['Newbie','Explorer','Learner','Scholar','Thinker','Achiever','Expert','Master','Guru','Legend','Prodigy'];
+const QUOTES = [
+  {text:"The secret of getting ahead is getting started.",author:"Mark Twain"},
+  {text:"An investment in knowledge pays the best interest.",author:"Benjamin Franklin"},
+  {text:"Education is the most powerful weapon to change the world.",author:"Nelson Mandela"},
+  {text:"The more that you read, the more things you will know.",author:"Dr. Seuss"},
+  {text:"Learning never exhausts the mind.",author:"Leonardo da Vinci"},
+  {text:"Study hard what interests you the most in the most undisciplined way.",author:"Richard Feynman"},
+  {text:"The beautiful thing about learning is nobody can take it away from you.",author:"B.B. King"},
+  {text:"Live as if you were to die tomorrow. Learn as if you were to live forever.",author:"Mahatma Gandhi"},
+  {text:"Success is no accident. It is hard work, perseverance, learning, sacrifice.",author:"Pelé"},
+  {text:"Develop a passion for learning. If you do, you will never cease to grow.",author:"Anthony J. D'Angelo"}
+];
+const TIPS = [
+  "Use active recall — test yourself instead of just re-reading notes.",
+  "Study in 25-minute focused sessions with 5-minute breaks (Pomodoro).",
+  "Teach what you've learned to someone else to solidify understanding.",
+  "Review material within 24 hours to boost memory retention by 80%.",
+  "Write notes by hand — it improves memory more than typing.",
+  "Start with the hardest subject when your mind is freshest.",
+  "Get 7-9 hours of sleep — your brain consolidates memory while you sleep.",
+  "Break big goals into small, daily tasks to avoid overwhelm.",
+  "Use flashcards for facts, formulas, and vocabulary.",
+  "Stay hydrated — even mild dehydration reduces focus by 20%.",
+  "Eliminate phone notifications during study sessions.",
+  "Quiz yourself daily, not just before exams.",
+];
+const BADGE_DEFS = [
+  {id:'first_card',emoji:'🃏',name:'First Card',desc:'Add your first flashcard'},
+  {id:'quiz5',emoji:'🎯',name:'Quiz Ace',desc:'Score 5/5 on a quiz'},
+  {id:'streak3',emoji:'🔥',name:'On Fire',desc:'3-day study streak'},
+  {id:'streak7',emoji:'🌟',name:'Week Warrior',desc:'7-day streak'},
+  {id:'pomodoro5',emoji:'🍅',name:'Pomodoro Fan',desc:'Complete 5 pomodoros'},
+  {id:'notes10',emoji:'📓',name:'Note Taker',desc:'Write 10 notes'},
+  {id:'hw10',emoji:'✅',name:'Finisher',desc:'Complete 10 homework tasks'},
+  {id:'level5',emoji:'🏆',name:'Level 5',desc:'Reach level 5'},
+  {id:'coins100',emoji:'💰',name:'Rich Student',desc:'Earn 100 coins'},
+  {id:'hours5',emoji:'⏰',name:'5 Hours',desc:'Study for 5 hours total'},
+  {id:'cards20',emoji:'📚',name:'Card Collector',desc:'Have 20 flashcards'},
+  {id:'perfect',emoji:'💯',name:'Perfectionist',desc:'100% on any quiz'},
+];
+const PREMADE_DECKS = [
+  {name:'Math Basics',emoji:'🔢',cards:[
+    {q:'What is the quadratic formula?',a:'x = (-b ± √(b²-4ac)) / 2a'},
+    {q:'What is the Pythagorean theorem?',a:'a² + b² = c²'},
+    {q:'Area of a circle?',a:'A = πr²'},
+    {q:'What is a prime number?',a:'A number divisible only by 1 and itself'},
+  ]},
+  {name:'Science Facts',emoji:'🔬',cards:[
+    {q:'Speed of light?',a:'299,792,458 m/s (~3×10⁸ m/s)'},
+    {q:'What is photosynthesis?',a:'Plants convert sunlight + CO₂ + water into glucose + oxygen'},
+    {q:'What is Newton\'s 1st Law?',a:'An object stays at rest or in motion unless acted upon by a force'},
+    {q:'Atomic number of Hydrogen?',a:'1'},
+  ]},
+  {name:'English Vocab',emoji:'📖',cards:[
+    {q:'Ubiquitous',a:'Present everywhere at the same time'},
+    {q:'Ephemeral',a:'Lasting for a very short time'},
+    {q:'Eloquent',a:'Fluent and persuasive in speaking or writing'},
+    {q:'Perseverance',a:'Continued effort despite difficulty or delay'},
+  ]},
+];
+
+// ══════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════
+let D = {
+  user:{name:'Student',avatar:'🎓',xp:0,level:1,coins:0,streak:0,streakFreeze:1,
+    lastStudyDate:null,totalStudyTime:0,totalSessions:0,pomodorosDone:0,theme:'dark'},
+  flashcards:[],notes:[],homework:[],sessions:[],exams:[],
+  earnedBadges:[],challenges:{date:null,list:[]},quizHistory:[],
+};
+
+function save(){localStorage.setItem('studymate_v2',JSON.stringify(D));}
+function load(){
+  const raw=localStorage.getItem('studymate_v2');
+  if(raw){try{D=JSON.parse(raw);}catch(e){}}
+  if(!D.user.streakFreeze&&D.user.streakFreeze!==0)D.user.streakFreeze=1;
+}
+
+// ══════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════
+function getLevel(xp){
+  for(let i=LEVELS.length-1;i>=0;i--){if(xp>=LEVELS[i])return i+1;}return 1;
+}
+function getLevelXP(lvl){return LEVELS[Math.min(lvl-1,LEVELS.length-1)];}
+function getNextXP(lvl){return LEVELS[Math.min(lvl,LEVELS.length-1)];}
+function xpPct(){const l=D.user.level;const cur=D.user.xp-getLevelXP(l);const need=getNextXP(l)-getLevelXP(l);return Math.min(100,Math.round(cur/need*100));}
+
+function addXP(amount,label=''){
+  const oldLvl=D.user.level;
+  D.user.xp+=amount;
+  D.user.level=getLevel(D.user.xp);
+  if(D.user.level>oldLvl){showToast(`🎉 Level Up! You're now Level ${D.user.level}!`);}
+  markStudied();
+  checkBadges();
+  save();
+}
+function addCoins(n){D.user.coins+=n;save();}
+
+function markStudied(){
+  const today=todayStr();
+  if(D.user.lastStudyDate!==today){
+    const yesterday=new Date();yesterday.setDate(yesterday.getDate()-1);
+    const yStr=fmtDate(yesterday);
+    if(D.user.lastStudyDate===yStr){D.user.streak++;}
+    else if(D.user.lastStudyDate!==today){
+      if(D.user.streakFreeze>0&&D.user.streak>0){D.user.streakFreeze--;showToast('❄️ Streak Freeze used!');}
+      else{D.user.streak=1;}
+    }
+    D.user.lastStudyDate=today;
+  }
+}
+function todayStr(){return fmtDate(new Date());}
+function fmtDate(d){return d.toISOString().split('T')[0];}
+function fmtTime(d){return new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric'});}
+
+function checkBadges(){
+  const earn=(id)=>{if(!D.earnedBadges.includes(id)){D.earnedBadges.push(id);const b=BADGE_DEFS.find(x=>x.id===id);if(b)showToast(`🏅 Badge Earned: ${b.name}!`);}};
+  if(D.flashcards.length>=1)earn('first_card');
+  if(D.flashcards.length>=20)earn('cards20');
+  if(D.user.streak>=3)earn('streak3');
+  if(D.user.streak>=7)earn('streak7');
+  if(D.user.pomodorosDone>=5)earn('pomodoro5');
+  if(D.notes.length>=10)earn('notes10');
+  if(D.user.level>=5)earn('level5');
+  if(D.user.coins>=100)earn('coins100');
+  if(D.user.totalStudyTime>=300)earn('hours5');
+  const doneHW=D.homework.filter(h=>h.done).length;
+  if(doneHW>=10)earn('hw10');
+}
+
+function getDailyChallenges(){
+  const today=todayStr();
+  if(D.challenges.date===today)return D.challenges.list;
+  D.challenges={date:today,list:[
+    {id:'c1',name:'Study Session',desc:'Complete 1 Pomodoro',icon:'🍅',goal:1,progress:0,xp:30,done:false,type:'pomodoro'},
+    {id:'c2',name:'Quiz Time',desc:'Answer 3 quiz questions',icon:'🎯',goal:3,progress:0,xp:20,done:false,type:'quiz'},
+    {id:'c3',name:'Note It',desc:'Write or review 1 note',icon:'📝',goal:1,progress:0,xp:15,done:false,type:'note'},
+  ]};
+  save();
+  return D.challenges.list;
+}
+function updateChallenge(type,amount=1){
+  if(D.challenges.date!==todayStr())return;
+  D.challenges.list.forEach(c=>{
+    if(c.type===type&&!c.done){
+      c.progress=Math.min(c.goal,c.progress+amount);
+      if(c.progress>=c.goal){c.done=true;addXP(c.xp);addCoins(5);showToast(`✅ Challenge done! +${c.xp} XP`);}
+    }
+  });
+  save();
+}
+
+let currentPage='home';
+let timerInterval=null;
+let timerSeconds=25*60;
+let timerRunning=false;
+let timerMode='work';
+let timerModes={work:25*60,short:5*60,long:15*60};
+let currentDeckId=null;
+let currentCardIdx=0;
+let currentFlipped=false;
+let quizState=null;
+let searchQuery='';
+
+// ══════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════
+function navigate(page){
+  if(timerRunning&&page!=='timer'&&currentPage==='timer'){
+    if(!confirm('Timer is running! Leave anyway?'))return;
+  }
+  currentPage=page;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('nav-'+page).classList.add('active');
+  renderPage();
+}
+
+function renderPage(){
+  const c=document.getElementById('content');
+  const t=document.getElementById('topbar-title');
+  const a=document.getElementById('topbar-actions');
+  c.innerHTML='';
+  if(currentPage==='home'){
+    t.innerHTML='Study<span style="color:var(--primary)">Mate</span>';
+    a.innerHTML=`<button class="icon-btn" onclick="openSearch()">🔍</button><button class="icon-btn" onclick="toggleTheme()">${D.user.theme==='dark'?'🌙':'☀️'}</button>`;
+    renderHome(c);
+  }else if(currentPage==='cards'){
+    if(currentDeckId!==null){renderDeck(c);}
+    else{t.innerHTML='Flashcards';a.innerHTML=`<button class="icon-btn" onclick="openAddDeck()">➕</button>`;renderCards(c);}
+  }else if(currentPage==='notes'){
+    t.innerHTML='Notes & Homework';a.innerHTML=`<button class="icon-btn" onclick="openAddNote()">➕</button>`;renderNotes(c);
+  }else if(currentPage==='timer'){
+    t.innerHTML='Study Timer';a.innerHTML='';renderTimer(c);
+  }else if(currentPage==='me'){
+    t.innerHTML='My Profile';a.innerHTML=`<button class="icon-btn" onclick="openSettings()">⚙️</button>`;renderMe(c);
+  }
+}
+
+// ══════════════════════════════════════════
+// HOME PAGE
+// ══════════════════════════════════════════
+function renderHome(c){
+  const lvl=D.user.level;const xpP=xpPct();
+  const quote=QUOTES[new Date().getDate()%QUOTES.length];
+  const challenges=getDailyChallenges();
+  c.innerHTML=`<div class="page">
+  <div style="padding:4px 0 14px;display:flex;align-items:center;justify-content:space-between;">
+    <div><div style="font-size:13px;color:var(--text3);font-weight:700;">Good ${greeting()},</div>
+    <div style="font-size:22px;font-weight:900;color:var(--text);">${D.user.avatar} ${D.user.name}</div></div>
+    <div style="text-align:right;"><div style="font-size:22px;font-weight:900;color:var(--gold);">🪙 ${D.user.coins}</div>
+    <div style="font-size:11px;color:var(--text3);">coins</div></div>
+  </div>
+  <div class="xp-card">
+    <div class="xp-top">
+      <div><div class="xp-name">${LEVEL_NAMES[Math.min(lvl-1,LEVEL_NAMES.length-1)]}</div>
+      <div class="xp-label">${D.user.xp} total XP</div></div>
+      <div class="level-badge">Lvl ${lvl}</div>
+    </div>
+    <div class="xp-bar-bg"><div class="xp-bar-fill" style="width:${xpP}%"></div></div>
+    <div class="xp-nums"><span>${D.user.xp - getLevelXP(lvl)} XP</span><span>${getNextXP(lvl)-getLevelXP(lvl)} needed</span></div>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-icon">🔥</div><div class="stat-value">${D.user.streak}</div><div class="stat-label">Day Streak</div></div>
+    <div class="stat-card"><div class="stat-icon">📚</div><div class="stat-value">${D.flashcards.length}</div><div class="stat-label">Flashcards</div></div>
+    <div class="stat-card"><div class="stat-icon">⏱️</div><div class="stat-value">${Math.floor(D.user.totalStudyTime/60)}h</div><div class="stat-label">Studied</div></div>
+  </div>
+  <div class="quote-card">
+    <div class="quote-text">"${quote.text}"</div>
+    <div class="quote-author">— ${quote.author}</div>
+  </div>
+  <div class="section-title">Today's Challenges</div>
+  ${challenges.map(ch=>`
+  <div class="challenge-card${ch.done?' challenge-done':''}">
+    <div class="challenge-icon">${ch.icon}</div>
+    <div class="challenge-info">
+      <div class="challenge-name">${ch.name}</div>
+      <div class="challenge-desc">${ch.desc}</div>
+      <div class="challenge-prog"><div class="challenge-prog-fill" style="width:${Math.round(ch.progress/ch.goal*100)}%"></div></div>
+    </div>
+    <div class="challenge-xp">${ch.done?'✓':'+'+ch.xp} XP</div>
+  </div>`).join('')}
+  <div class="section-title">Quick Actions</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+    <button class="btn btn-primary" onclick="navigate('timer')">🍅 Start Timer</button>
+    <button class="btn btn-secondary" onclick="navigate('cards')">📚 Study Cards</button>
+    <button class="btn btn-ghost" onclick="navigate('notes')">📝 My Notes</button>
+    <button class="btn btn-ghost" onclick="openExamModal()">📅 Add Exam</button>
+  </div>
+  ${D.exams.length>0?`<div class="section-title">Upcoming Exams</div>`+D.exams.slice(0,3).map(ex=>{
+    const days=Math.ceil((new Date(ex.date)-new Date())/(1000*60*60*24));
+    return `<div class="exam-card"><div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div><div class="exam-name">📅 ${ex.name}</div><div class="exam-date">${ex.subject} · ${ex.date}</div></div>
+      <button onclick="deleteExam('${ex.id}')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;">✕</button>
+    </div>
+    <div class="exam-days">${days<0?'Past':days===0?'Today!':days}</div>
+    <div class="exam-days-label">${days<0?'exam passed':days===0?'Good luck!':days===1?'day left':'days left'}</div></div>`;
+  }).join(''):''}
+  <div style="height:10px;"></div>
+  </div>`;
+}
+function greeting(){const h=new Date().getHours();return h<12?'Morning':h<17?'Afternoon':'Evening';}
+
+// ══════════════════════════════════════════
+// CARDS PAGE
+// ══════════════════════════════════════════
+function renderCards(c){
+  c.innerHTML=`<div class="page">
+  <div class="search-bar"><span>🔍</span><input type="text" placeholder="Search decks..." value="${searchQuery}" oninput="searchQuery=this.value;renderPage()"></div>
+  <div class="section-title">My Decks</div>
+  ${D.flashcards.filter(d=>!searchQuery||d.name.toLowerCase().includes(searchQuery.toLowerCase())).map(d=>`
+  <div class="deck-item" onclick="openDeck('${d.id}')">
+    <div class="deck-emoji">${d.emoji||'📚'}</div>
+    <div class="deck-info"><div class="deck-name">${d.name}</div>
+    <div class="deck-count">${d.cards.length} card${d.cards.length!==1?'s':''}</div></div>
+    <div class="deck-arrow">›</div>
+  </div>`).join('')||'<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">No decks yet</div><div class="empty-sub">Tap + to create your first deck</div></div>'}
+  <div class="section-title">Pre-made Decks</div>
+  ${PREMADE_DECKS.map((pd,i)=>`
+  <div class="deck-item" onclick="importDeck(${i})">
+    <div class="deck-emoji">${pd.emoji}</div>
+    <div class="deck-info"><div class="deck-name">${pd.name}</div>
+    <div class="deck-count">${pd.cards.length} cards · Tap to import</div></div>
+    <div style="font-size:12px;background:var(--secondary-soft);color:var(--secondary);padding:4px 8px;border-radius:8px;font-weight:700;">Import</div>
+  </div>`).join('')}
+  <div style="height:10px;"></div></div>`;
+}
+
+function openDeck(id){currentDeckId=id;currentCardIdx=0;currentFlipped=false;renderDeck(document.getElementById('content'));}
+function backToDecks(){currentDeckId=null;document.getElementById('topbar-title').innerHTML='Flashcards';document.getElementById('topbar-actions').innerHTML=`<button class="icon-btn" onclick="openAddDeck()">➕</button>`;renderCards(document.getElementById('content'));}
+
+function renderDeck(c){
+  const deck=D.flashcards.find(d=>d.id===currentDeckId);
+  if(!deck){backToDecks();return;}
+  const card=deck.cards[currentCardIdx];
+  document.getElementById('topbar-title').innerHTML=`<span style="cursor:pointer;font-size:16px;margin-right:8px;" onclick="backToDecks()">‹</span>${deck.name}`;
+  document.getElementById('topbar-actions').innerHTML=`<button class="icon-btn" onclick="openAddCard('${deck.id}')">➕</button><button class="icon-btn btn-danger" onclick="confirmDeleteDeck('${deck.id}')">🗑️</button>`;
+  if(deck.cards.length===0){
+    c.innerHTML=`<div class="page"><div class="empty"><div class="empty-icon">🃏</div><div class="empty-text">No cards yet</div><div class="empty-sub">Add your first card below</div></div><button class="btn btn-primary" onclick="openAddCard('${deck.id}')">➕ Add Card</button></div>`;return;
+  }
+  c.innerHTML=`<div class="page">
+  <div style="text-align:center;font-size:12px;color:var(--text3);font-weight:700;margin-bottom:8px;">${currentCardIdx+1} / ${deck.cards.length}</div>
+  <div class="flashcard-scene" onclick="flipCard()">
+    <div class="flashcard-inner${currentFlipped?' flipped':''}" id="card-inner">
+      <div class="flashcard-face">
+        <div class="flashcard-label">Question</div>
+        <div class="flashcard-text">${card.q}</div>
+        <div class="flashcard-hint">Tap to reveal answer</div>
+      </div>
+      <div class="flashcard-face flashcard-back">
+        <div class="flashcard-label">Answer</div>
+        <div class="flashcard-text">${card.a}</div>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;margin-bottom:16px;">
+    <button class="btn btn-ghost" onclick="prevCard()" ${currentCardIdx===0?'disabled':''} style="${currentCardIdx===0?'opacity:.4':''}">‹ Prev</button>
+    <button class="btn btn-ghost" onclick="nextCard()" ${currentCardIdx===deck.cards.length-1?'disabled':''} style="${currentCardIdx===deck.cards.length-1?'opacity:.4':''}">Next ›</button>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+    <button class="btn btn-primary" onclick="startQuiz('${deck.id}')">🎯 Quiz Me</button>
+    <button class="btn btn-secondary" onclick="shuffleCards()">🔀 Shuffle</button>
+  </div>
+  <div class="section-title">All Cards</div>
+  ${deck.cards.map((cd,i)=>`
+  <div class="card" style="cursor:pointer;" onclick="jumpCard(${i})">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:800;color:var(--text3);margin-bottom:4px;">Q${i+1}</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text);">${cd.q}</div>
+        <div style="font-size:13px;color:var(--text3);margin-top:4px;">${cd.a}</div>
+      </div>
+      <button onclick="event.stopPropagation();deleteCard('${deck.id}',${i})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:4px;">✕</button>
+    </div>
+  </div>`).join('')}
+  <div style="height:10px;"></div></div>`;
+}
+
+function flipCard(){currentFlipped=!currentFlipped;document.getElementById('card-inner').className='flashcard-inner'+(currentFlipped?' flipped':'');}
+function nextCard(){const deck=D.flashcards.find(d=>d.id===currentDeckId);if(currentCardIdx<deck.cards.length-1){currentCardIdx++;currentFlipped=false;renderDeck(document.getElementById('content'));}}
+function prevCard(){if(currentCardIdx>0){currentCardIdx--;currentFlipped=false;renderDeck(document.getElementById('content'));}}
+function jumpCard(i){currentCardIdx=i;currentFlipped=false;renderDeck(document.getElementById('content'));}
+function shuffleCards(){const deck=D.flashcards.find(d=>d.id===currentDeckId);deck.cards.sort(()=>Math.random()-.5);currentCardIdx=0;currentFlipped=false;save();renderDeck(document.getElementById('content'));showToast('🔀 Cards shuffled!');}
+
+function importDeck(i){
+  const pd=PREMADE_DECKS[i];
+  const existing=D.flashcards.find(d=>d.name===pd.name);
+  if(existing){showToast('Already imported!');return;}
+  D.flashcards.push({id:uid(),name:pd.name,emoji:pd.emoji,cards:[...pd.cards]});
+  save();checkBadges();showToast(`✅ ${pd.name} imported!`);renderCards(document.getElementById('content'));
+}
+function confirmDeleteDeck(id){if(confirm('Delete this deck?')){D.flashcards=D.flashcards.filter(d=>d.id!==id);save();backToDecks();}}
+function deleteCard(deckId,idx){const deck=D.flashcards.find(d=>d.id===deckId);deck.cards.splice(idx,1);if(currentCardIdx>=deck.cards.length)currentCardIdx=Math.max(0,deck.cards.length-1);save();renderDeck(document.getElementById('content'));}
+
+// ══════════════════════════════════════════
+// QUIZ
+// ══════════════════════════════════════════
+function startQuiz(deckId){
+  const deck=D.flashcards.find(d=>d.id===deckId);
+  if(deck.cards.length<2){showToast('Need at least 2 cards to quiz!');return;}
+  const cards=[...deck.cards].sort(()=>Math.random()-.5).slice(0,Math.min(5,deck.cards.length));
+  quizState={deckId,cards,current:0,score:0,answered:false,total:cards.length};
+  renderQuiz();
+}
+function renderQuiz(){
+  const c=document.getElementById('content');
+  const q=quizState;
+  if(q.current>=q.total){renderQuizResult();return;}
+  const card=q.cards[q.current];
+  const deck=D.flashcards.find(d=>d.id===q.deckId);
+  const wrongAnswers=deck.cards.filter(c=>c.a!==card.a).sort(()=>Math.random()-.5).slice(0,3).map(c=>c.a);
+  const opts=[card.a,...wrongAnswers].sort(()=>Math.random()-.5);
+  const letters=['A','B','C','D'];
+  document.getElementById('topbar-title').innerHTML=`<span style="cursor:pointer;font-size:16px;margin-right:8px;" onclick="endQuiz()">‹</span>Quiz`;
+  document.getElementById('topbar-actions').innerHTML='';
+  c.innerHTML=`<div class="page" style="padding-top:10px;">
+  <div class="quiz-progress"><div class="quiz-progress-fill" style="width:${(q.current/q.total)*100}%"></div></div>
+  <div class="quiz-counter">Question ${q.current+1} of ${q.total} · Score: ${q.score}</div>
+  <div class="quiz-question">${card.q}</div>
+  ${opts.map((opt,i)=>`<div class="quiz-option" id="opt${i}" onclick="answerQuiz(${i},'${escQ(opt)}','${escQ(card.a)}')">
+    <div class="quiz-option-letter">${letters[i]}</div>${opt}</div>`).join('')}
+  </div>`;
+}
+function escQ(s){return s.replace(/'/g,"\\'").replace(/"/g,'&quot;');}
+function answerQuiz(idx,selected,correct){
+  if(quizState.answered)return;
+  quizState.answered=true;
+  const opts=document.querySelectorAll('.quiz-option');
+  opts.forEach((o,i)=>{const txt=o.textContent.slice(1);if(txt.trim()===correct.trim())o.classList.add('correct');});
+  if(selected===correct){quizState.score++;opts[idx].classList.add('correct');}
+  else{opts[idx].classList.add('wrong');}
+  updateChallenge('quiz');
+  addXP(selected===correct?5:1);
+  setTimeout(()=>{quizState.current++;quizState.answered=false;renderQuiz();},900);
+}
+function renderQuizResult(){
+  const q=quizState;const pct=Math.round(q.score/q.total*100);
+  const grade=pct===100?'Perfect! 🌟':pct>=80?'Great job! 🎉':pct>=60?'Good work! 👍':'Keep practicing! 💪';
+  D.quizHistory.push({date:todayStr(),score:q.score,total:q.total,deckId:q.deckId});
+  if(q.score===5||pct===100){checkBadge('quiz5');checkBadge('perfect');}
+  save();
+  document.getElementById('content').innerHTML=`<div class="page"><div class="quiz-result">
+    <div style="font-size:56px;margin-bottom:8px;">🎯</div>
+    <div class="quiz-score">${q.score}/${q.total}</div>
+    <div class="quiz-grade">${grade}</div>
+    <div class="quiz-detail">${pct}% correct · +${q.score*5+5} XP earned</div>
+    <div style="margin-top:24px;display:flex;flex-direction:column;gap:10px;">
+      <button class="btn btn-primary" onclick="startQuiz('${q.deckId}')">🔄 Try Again</button>
+      <button class="btn btn-ghost" onclick="openDeck('${q.deckId}')">📚 Back to Deck</button>
+    </div>
+  </div></div>`;
+}
+function checkBadge(id){if(!D.earnedBadges.includes(id)){D.earnedBadges.push(id);const b=BADGE_DEFS.find(x=>x.id===id);if(b)showToast(`🏅 Badge: ${b.name}!`);save();}}
+function endQuiz(){openDeck(quizState.deckId);}
+
+// ══════════════════════════════════════════
+// NOTES PAGE
+// ══════════════════════════════════════════
+function renderNotes(c){
+  const subjects=['All',...new Set(D.notes.map(n=>n.subject))];
+  const filter=window._noteFilter||'All';
+  const filtered=D.notes.filter(n=>filter==='All'||n.subject===filter);
+  const overdueHW=D.homework.filter(h=>!h.done&&h.due&&new Date(h.due)<new Date()).length;
+  c.innerHTML=`<div class="page">
+  <div class="search-bar"><span>🔍</span><input type="text" placeholder="Search notes..." oninput="filterNotes(this.value)"></div>
+  <div class="chips">${subjects.map(s=>`<div class="chip${s===filter?' active':''}" onclick="setNoteFilter('${s}')">${s}</div>`).join('')}</div>
+  <div class="section-title">Notes (${filtered.length})</div>
+  ${filtered.map(n=>`<div class="note-item" onclick="openNote('${n.id}')">
+    <div class="note-title">${n.title}</div>
+    <div class="note-preview">${n.body}</div>
+    <div class="note-meta"><span class="tag${n.subject==='Science'?' blue':n.subject==='Math'?' green':''}">${n.subject||'General'}</span>
+    <span class="note-date">${fmtTime(n.date)}</span></div>
+  </div>`).join('')||'<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">No notes yet</div><div class="empty-sub">Tap + to write your first note</div></div>'}
+  <div class="section-title">Homework ${overdueHW>0?`<span style="color:#ff5050;font-size:11px;">(${overdueHW} overdue)</span>`:''}(${D.homework.filter(h=>!h.done).length} left)</div>
+  ${D.homework.map(h=>{const overdue=h.due&&!h.done&&new Date(h.due)<new Date();return`<div class="hw-item">
+    <div class="hw-check${h.done?' done':''}" onclick="toggleHW('${h.id}')">${h.done?'✓':''}</div>
+    <div class="hw-info"><div class="hw-title${h.done?' done':''}">${h.title}</div>
+    <div class="hw-due${overdue?' overdue':''}">${h.subject}${h.due?' · Due: '+h.due:''}</div></div>
+    <button class="hw-del" onclick="deleteHW('${h.id}')">✕</button>
+  </div>`;}).join('')||'<div class="empty" style="padding:20px 0;"><div class="empty-icon" style="font-size:32px;">✅</div><div class="empty-text" style="font-size:14px;">No homework!</div></div>'}
+  <button class="btn btn-ghost" style="margin-top:8px;" onclick="openAddHW()">➕ Add Homework</button>
+  <div style="height:10px;"></div></div>`;
+}
+function setNoteFilter(s){window._noteFilter=s;renderPage();}
+function filterNotes(q){searchQuery=q;renderPage();}
+
+function openNote(id){
+  const n=D.notes.find(x=>x.id===id);if(!n)return;
+  showModal(`<div class="modal-handle"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div class="modal-title" style="margin:0;">${n.title}</div>
+      <button onclick="deleteNote('${n.id}');closeModal();" style="background:none;border:none;cursor:pointer;color:#ff5050;font-size:18px;">🗑️</button>
+    </div>
+    <div style="margin-bottom:8px;"><span class="tag">${n.subject||'General'}</span></div>
+    <div style="font-size:14px;color:var(--text2);line-height:1.7;white-space:pre-wrap;">${n.body}</div>
+    <div style="margin-top:16px;font-size:12px;color:var(--text3);">Added ${fmtTime(n.date)}</div>
+    <div style="height:10px;"></div>`);
+  updateChallenge('note');
+}
+function deleteNote(id){D.notes=D.notes.filter(n=>n.id!==id);save();renderPage();}
+function toggleHW(id){const h=D.homework.find(x=>x.id===id);h.done=!h.done;if(h.done){addXP(10);addCoins(2);showToast('✅ Task done! +10 XP');checkBadges();}save();renderPage();}
+function deleteHW(id){D.homework=D.homework.filter(h=>h.id!==id);save();renderPage();}
+
+// ══════════════════════════════════════════
+// TIMER PAGE
+// ══════════════════════════════════════════
+function renderTimer(c){
+  const total=timerModes[timerMode];
+  const pct=timerSeconds/total;
+  const circ=2*Math.PI*100;
+  const offset=circ*(1-pct);
+  const m=Math.floor(timerSeconds/60);const s=timerSeconds%60;
+  const recentSessions=D.sessions.slice(-5).reverse();
+  c.innerHTML=`<div class="page">
+  <div class="timer-modes">
+    ${['work','short','long'].map(m2=>`<div class="mode-btn${timerMode===m2?' active':''}" onclick="setTimerMode('${m2}')">
+      <div class="mode-btn-label">${m2==='work'?'Focus':m2==='short'?'Short Break':'Long Break'}</div>
+      <div class="mode-btn-time">${timerModes[m2]/60}m</div>
+    </div>`).join('')}
+  </div>
+  <div class="timer-display">
+    <div class="timer-mode">${timerMode==='work'?'🍅 Focus Time':timerMode==='short'?'☕ Short Break':'🛌 Long Break'}</div>
+    <div class="timer-circle-wrapper">
+      <svg class="timer-svg" width="220" height="220" viewBox="0 0 220 220">
+        <circle class="timer-track" cx="110" cy="110" r="100"/>
+        <circle class="timer-progress" cx="110" cy="110" r="100"
+          stroke="${timerMode==='work'?'var(--primary)':timerMode==='short'?'var(--secondary)':'var(--green)'}"
+          stroke-dasharray="${circ}" stroke-dashoffset="${offset}"/>
+      </svg>
+      <div class="timer-time">${pad(m)}:${pad(s)}</div>
+      <div class="timer-session">Session ${D.user.pomodorosDone+1}</div>
+    </div>
+    <div class="timer-controls">
+      <button class="timer-btn timer-stop" onclick="resetTimer()">↺</button>
+      <button class="timer-btn timer-play" onclick="toggleTimer()" id="timer-play-btn">${timerRunning?'⏸':'▶'}</button>
+      <button class="timer-btn timer-stop" onclick="skipTimer()">⏭</button>
+    </div>
+  </div>
+  <div class="session-log">
+    <div class="session-log-title">Recent Sessions</div>
+    ${recentSessions.length?recentSessions.map(s=>`<div class="session-item">
+      <span class="session-name">${s.mode==='work'?'🍅 Focus':s.mode==='short'?'☕ Break':'🛌 Long Break'}</span>
+      <span class="session-time">${s.duration}m</span>
+      <span class="session-xp">+${s.xp} XP</span>
+    </div>`).join(''):'<div style="text-align:center;color:var(--text3);font-size:13px;padding:8px;">No sessions yet — start studying!</div>'}
+  </div>
+  <div style="height:10px;"></div></div>`;
+}
+function pad(n){return n.toString().padStart(2,'0');}
+function setTimerMode(mode){if(timerRunning)return;timerMode=mode;timerSeconds=timerModes[mode];renderPage();}
+function toggleTimer(){timerRunning?pauseTimer():startTimer();}
+function startTimer(){
+  timerRunning=true;
+  timerInterval=setInterval(()=>{
+    timerSeconds--;
+    if(timerSeconds<=0){timerDone();return;}
+    updateTimerDisplay();
+  },1000);
+  document.getElementById('timer-play-btn').textContent='⏸';
+}
+function pauseTimer(){timerRunning=false;clearInterval(timerInterval);document.getElementById('timer-play-btn').textContent='▶';}
+function resetTimer(){clearInterval(timerInterval);timerRunning=false;timerSeconds=timerModes[timerMode];renderPage();}
+function skipTimer(){timerDone();}
+function updateTimerDisplay(){
+  const m=Math.floor(timerSeconds/60);const s=timerSeconds%60;
+  const el=document.querySelector('.timer-time');
+  if(el)el.textContent=`${pad(m)}:${pad(s)}`;
+  const total=timerModes[timerMode];const pct=timerSeconds/total;
+  const circ=2*Math.PI*100;const offset=circ*(1-pct);
+  const prog=document.querySelector('.timer-progress');
+  if(prog)prog.setAttribute('stroke-dashoffset',offset);
+}
+function timerDone(){
+  clearInterval(timerInterval);timerRunning=false;
+  const dur=timerModes[timerMode]/60;
+  if(timerMode==='work'){
+    const xpGain=20;
+    D.user.pomodorosDone++;
+    D.user.totalStudyTime+=dur;
+    D.user.totalSessions++;
+    D.sessions.push({mode:timerMode,duration:dur,xp:xpGain,date:todayStr()});
+    addXP(xpGain);addCoins(3);
+    updateChallenge('pomodoro');
+    checkBadges();
+    showToast(`🍅 Session done! +${xpGain} XP +3 🪙`);
+    timerMode='short';
+  }else{
+    showToast('Break over! Ready to focus? 💪');
+    timerMode='work';
+  }
+  timerSeconds=timerModes[timerMode];save();renderPage();
+}
+
+// ══════════════════════════════════════════
+// ME / PROFILE PAGE
+// ══════════════════════════════════════════
+function renderMe(c){
+  const earned=D.earnedBadges.length;
+  const totalStudyH=(D.user.totalStudyTime/60).toFixed(1);
+  const quizAvg=D.quizHistory.length?Math.round(D.quizHistory.reduce((a,q)=>a+q.score/q.total*100,0)/D.quizHistory.length):0;
+  c.innerHTML=`<div class="page">
+  <div class="profile-header">
+    <div class="avatar-big" onclick="changeAvatar()">${D.user.avatar}</div>
+    <div class="profile-name" onclick="changeName()">${D.user.name} ✏️</div>
+    <div class="profile-sub">Level ${D.user.level} ${LEVEL_NAMES[Math.min(D.user.level-1,LEVEL_NAMES.length-1)]} · ${D.user.xp} XP</div>
+    <div style="margin-top:12px;display:flex;gap:8px;justify-content:center;">
+      <div style="background:var(--primary-soft);border-radius:10px;padding:8px 14px;text-align:center;">
+        <div style="font-size:18px;font-weight:900;color:var(--primary);">${D.user.streak}</div>
+        <div style="font-size:11px;color:var(--text3);font-weight:700;">🔥 Streak</div>
+      </div>
+      <div style="background:var(--gold-soft);border-radius:10px;padding:8px 14px;text-align:center;">
+        <div style="font-size:18px;font-weight:900;color:var(--gold);">${D.user.coins}</div>
+        <div style="font-size:11px;color:var(--text3);font-weight:700;">🪙 Coins</div>
+      </div>
+      <div style="background:var(--green-soft);border-radius:10px;padding:8px 14px;text-align:center;">
+        <div style="font-size:18px;font-weight:900;color:var(--green);">${totalStudyH}h</div>
+        <div style="font-size:11px;color:var(--text3);font-weight:700;">⏱ Studied</div>
+      </div>
+    </div>
+  </div>
+  <div class="section-title">Badges (${earned}/${BADGE_DEFS.length})</div>
+  <div class="badges-grid">
+  ${BADGE_DEFS.map(b=>{const e=D.earnedBadges.includes(b.id);return`<div class="badge-item${e?' earned':' locked'}" title="${b.desc}">
+    <span class="badge-emoji">${b.emoji}</span>
+    <div class="badge-name">${b.name}</div>
+  </div>`}).join('')}
+  </div>
+  <div class="section-title">Stats</div>
+  <div class="card">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div><div style="font-size:11px;color:var(--text3);font-weight:700;">Flashcards</div><div style="font-size:20px;font-weight:900;color:var(--text);">${D.flashcards.reduce((a,d)=>a+d.cards.length,0)}</div></div>
+      <div><div style="font-size:11px;color:var(--text3);font-weight:700;">Pomodoros</div><div style="font-size:20px;font-weight:900;color:var(--text);">${D.user.pomodorosDone}</div></div>
+      <div><div style="font-size:11px;color:var(--text3);font-weight:700;">Quiz Avg</div><div style="font-size:20px;font-weight:900;color:var(--text);">${quizAvg}%</div></div>
+      <div><div style="font-size:11px;color:var(--text3);font-weight:700;">Notes</div><div style="font-size:20px;font-weight:900;color:var(--text);">${D.notes.length}</div></div>
+    </div>
+  </div>
+  <div class="section-title">Weekly Streak</div>
+  <div class="card"><div class="streak-row">
+    ${getLast7Days().map(d=>`<div class="streak-dot${d.active?' active':''}${d.isToday?' today':''}">${d.label}</div>`).join('')}
+  </div></div>
+  ${D.user.streakFreeze>0?`<div class="card" style="display:flex;align-items:center;gap:12px;">
+    <span style="font-size:28px;">❄️</span>
+    <div><div style="font-size:14px;font-weight:800;color:var(--text);">Streak Freeze</div>
+    <div style="font-size:12px;color:var(--text3);">${D.user.streakFreeze} freeze${D.user.streakFreeze>1?'s':''} available — protects your streak</div></div>
+  </div>`:''}
+  <div class="section-title">Study Tips</div>
+  <div class="card"><div class="tips-list">${TIPS.slice(0,5).map((t,i)=>`<div class="tip-item">
+    <div class="tip-num">${i+1}</div><div class="tip-text">${t}</div>
+  </div>`).join('')}</div></div>
+  <div style="height:10px;"></div></div>`;
+}
+function getLast7Days(){
+  const result=[];const today=todayStr();
+  for(let i=6;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);
+    const str=fmtDate(d);
+    const isToday=str===today;
+    const active=D.sessions.some(s=>s.date===str)||str===D.user.lastStudyDate;
+    result.push({label:d.toLocaleDateString('en',{weekday:'short'}).slice(0,2),active,isToday});
+  }return result;
+}
+
+// ══════════════════════════════════════════
+// MODALS
+// ══════════════════════════════════════════
+function showModal(html){
+  const existing=document.querySelector('.modal-overlay');if(existing)existing.remove();
+  const overlay=document.createElement('div');overlay.className='modal-overlay';
+  overlay.innerHTML=`<div class="modal">${html}</div>`;
+  overlay.addEventListener('click',e=>{if(e.target===overlay)closeModal();});
+  document.getElementById('app').appendChild(overlay);
+}
+function closeModal(){const o=document.querySelector('.modal-overlay');if(o)o.remove();}
+
+function openAddDeck(){
+  showModal(`<div class="modal-handle"></div>
+  <div class="modal-title">New Deck</div>
+  <input class="input" id="deck-name" placeholder="Deck name (e.g. Biology)">
+  <div style="margin-bottom:12px;">
+    <div style="font-size:13px;color:var(--text3);font-weight:700;margin-bottom:8px;">Choose icon:</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      ${['📚','🔢','🔬','📖','🌍','💻','🎨','⚗️','📐','🏛️'].map(e=>`<span style="font-size:24px;cursor:pointer;padding:4px;" onclick="selectDeckEmoji('${e}')">${e}</span>`).join('')}
+    </div>
+    <input class="input" id="deck-emoji" placeholder="Or type emoji" style="margin-top:8px;" value="📚">
+  </div>
+  <button class="btn btn-primary" onclick="createDeck()">Create Deck</button>`);
+}
+function selectDeckEmoji(e){document.getElementById('deck-emoji').value=e;}
+function createDeck(){
+  const name=document.getElementById('deck-name').value.trim();
+  const emoji=document.getElementById('deck-emoji').value||'📚';
+  if(!name){showToast('Enter a deck name!');return;}
+  D.flashcards.push({id:uid(),name,emoji,cards:[]});
+  save();closeModal();renderPage();showToast(`✅ "${name}" created!`);
+}
+
+function openAddCard(deckId){
+  showModal(`<div class="modal-handle"></div>
+  <div class="modal-title">Add Flashcard</div>
+  <input class="input" id="card-q" placeholder="Question">
+  <textarea class="input" id="card-a" placeholder="Answer"></textarea>
+  <button class="btn btn-primary" onclick="createCard('${deckId}')">Add Card</button>`);
+}
+function createCard(deckId){
+  const q=document.getElementById('card-q').value.trim();
+  const a=document.getElementById('card-a').value.trim();
+  if(!q||!a){showToast('Fill in question and answer!');return;}
+  const deck=D.flashcards.find(d=>d.id===deckId);
+  deck.cards.push({q,a});addXP(2);checkBadges();save();
+  closeModal();renderDeck(document.getElementById('content'));showToast('🃏 Card added! +2 XP');
+}
+
+function openAddNote(){
+  const subjects=['Math','Science','English','History','Other'];
+  showModal(`<div class="modal-handle"></div>
+  <div class="modal-title">New Note</div>
+  <input class="input" id="note-title" placeholder="Title">
+  <textarea class="input" id="note-body" placeholder="Write your note here..." style="min-height:130px;"></textarea>
+  <select class="input" id="note-subject" style="cursor:pointer;">
+    ${subjects.map(s=>`<option>${s}</option>`).join('')}
+  </select>
+  <button class="btn btn-primary" onclick="createNote()">Save Note</button>`);
+}
+function createNote(){
+  const title=document.getElementById('note-title').value.trim();
+  const body=document.getElementById('note-body').value.trim();
+  const subject=document.getElementById('note-subject').value;
+  if(!title||!body){showToast('Fill in title and note!');return;}
+  D.notes.unshift({id:uid(),title,body,subject,date:Date.now()});
+  addXP(3);updateChallenge('note');checkBadges();save();closeModal();renderPage();showToast('📝 Note saved! +3 XP');
+}
+
+function openAddHW(){
+  showModal(`<div class="modal-handle"></div>
+  <div class="modal-title">Add Homework</div>
+  <input class="input" id="hw-title" placeholder="Task (e.g. Math worksheet)">
+  <input class="input" id="hw-subject" placeholder="Subject">
+  <input class="input" type="date" id="hw-due" placeholder="Due date (optional)">
+  <button class="btn btn-primary" onclick="createHW()">Add Task</button>`);
+}
+function createHW(){
+  const title=document.getElementById('hw-title').value.trim();
+  const subject=document.getElementById('hw-subject').value.trim();
+  const due=document.getElementById('hw-due').value;
+  if(!title){showToast('Enter a task!');return;}
+  D.homework.unshift({id:uid(),title,subject,due,done:false});save();closeModal();renderPage();showToast('📋 Homework added!');
+}
+
+function openExamModal(){
+  showModal(`<div class="modal-handle"></div>
+  <div class="modal-title">Add Exam</div>
+  <input class="input" id="exam-name" placeholder="Exam name (e.g. Math Final)">
+  <input class="input" id="exam-subject" placeholder="Subject">
+  <input class="input" type="date" id="exam-date">
+  <button class="btn btn-primary" onclick="createExam()">Add Exam</button>`);
+}
+function createExam(){
+  const name=document.getElementById('exam-name').value.trim();
+  const subject=document.getElementById('exam-subject').value.trim();
+  const date=document.getElementById('exam-date').value;
+  if(!name||!date){showToast('Fill in name and date!');return;}
+  D.exams.push({id:uid(),name,subject,date});save();closeModal();renderPage();showToast('📅 Exam added!');
+}
+function deleteExam(id){D.exams=D.exams.filter(e=>e.id!==id);save();renderPage();}
+
+function openSettings(){
+  const colors=['#ff6b35','#3dd6f5','#2ecc71','#a855f7','#ec4899','#f59e0b'];
+  showModal(`<div class="modal-handle"></div>
+  <div class="modal-title">Settings</div>
+  <div class="setting-row">
+    <div><div class="setting-label">Dark Mode</div></div>
+    <button class="toggle${D.user.theme==='dark'?' on':''}" onclick="toggleThemeBtn(this)"></button>
+  </div>
+  <div class="setting-row">
+    <div><div class="setting-label">Accent Color</div>
+    <div class="color-row">${colors.map(col=>`<div class="color-swatch${col===getComputedStyle(document.documentElement).getPropertyValue('--primary').trim()?' selected':''}" style="background:${col}" onclick="setAccent('${col}')"></div>`).join('')}</div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <div class="setting-label" style="margin-bottom:10px;">Backup & Restore</div>
+  <button class="btn btn-ghost" style="margin-bottom:10px;" onclick="exportData()">📤 Export My Data</button>
+  <label class="btn btn-ghost" style="cursor:pointer;">📥 Import Data<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
+  <div class="divider"></div>
+  <button class="btn btn-danger" onclick="confirmReset()">⚠️ Reset All Data</button>`);
+}
+
+function toggleThemeBtn(btn){btn.classList.toggle('on');D.user.theme=btn.classList.contains('on')?'dark':'light';applyTheme();save();}
+function toggleTheme(){D.user.theme=D.user.theme==='dark'?'light':'dark';applyTheme();save();renderPage();}
+function applyTheme(){document.querySelector('.phone').className=D.user.theme==='light'?'phone light':'phone';}
+function setAccent(col){document.querySelector('.phone').style.setProperty('--primary',col);D.user.accentColor=col;save();showToast('Color updated!');}
+
+function exportData(){
+  const blob=new Blob([JSON.stringify(D,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='studymate-backup.json';a.click();
+  showToast('📤 Data exported!');
+}
+function importData(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{try{D=JSON.parse(ev.target.result);save();closeModal();renderPage();showToast('📥 Data imported!');}catch{showToast('Invalid file!');}};
+  reader.readAsText(file);
+}
+function confirmReset(){if(confirm('Reset ALL data? This cannot be undone.')){localStorage.removeItem('studymate_v2');location.reload();}}
+
+function changeName(){
+  const name=prompt('Enter your name:',D.user.name);
+  if(name&&name.trim()){D.user.name=name.trim();save();renderPage();}
+}
+function changeAvatar(){
+  const avatars=['🎓','😊','🧠','🦊','🐼','🦁','🐯','🦄','🐲','🤓','😎','🧑‍💻'];
+  showModal(`<div class="modal-handle"></div>
+  <div class="modal-title">Choose Avatar</div>
+  <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;padding:8px 0;">
+    ${avatars.map(a=>`<div style="font-size:40px;cursor:pointer;padding:8px;border-radius:12px;background:var(--card);" onclick="setAvatar('${a}')">${a}</div>`).join('')}
+  </div>`);
+}
+function setAvatar(a){D.user.avatar=a;save();closeModal();renderPage();}
+
+function openSearch(){
+  showModal(`<div class="modal-handle"></div>
+  <div class="modal-title">Search Everything</div>
+  <input class="input" id="global-search" placeholder="Search notes, decks, homework..." oninput="doSearch(this.value)" autofocus>
+  <div id="search-results" style="margin-top:8px;"></div>`);
+}
+function doSearch(q){
+  if(!q.trim()){document.getElementById('search-results').innerHTML='';return;}
+  const results=[];
+  D.notes.filter(n=>n.title.toLowerCase().includes(q.toLowerCase())||n.body.toLowerCase().includes(q.toLowerCase())).forEach(n=>results.push(`<div class="note-item" onclick="closeModal();openNote('${n.id}')"><div class="note-title">📝 ${n.title}</div><div class="note-preview">${n.body}</div></div>`));
+  D.flashcards.filter(d=>d.name.toLowerCase().includes(q.toLowerCase())).forEach(d=>results.push(`<div class="deck-item" onclick="closeModal();openDeck('${d.id}')"><div class="deck-emoji">${d.emoji}</div><div class="deck-info"><div class="deck-name">${d.name}</div><div class="deck-count">${d.cards.length} cards</div></div></div>`));
+  D.homework.filter(h=>h.title.toLowerCase().includes(q.toLowerCase())).forEach(h=>results.push(`<div class="hw-item"><div class="hw-check${h.done?' done':''}">${h.done?'✓':''}</div><div class="hw-info"><div class="hw-title${h.done?' done':''}">${h.title}</div><div class="hw-due">${h.subject}</div></div></div>`));
+  document.getElementById('search-results').innerHTML=results.length?results.join(''):'<div class="empty" style="padding:20px 0;"><div class="empty-icon" style="font-size:32px;">🔍</div><div class="empty-text" style="font-size:14px;">No results found</div></div>';
+}
+
+// ══════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════
+function uid(){return Math.random().toString(36).slice(2)+Date.now().toString(36);}
+let toastTimeout;
+function showToast(msg){
+  const existing=document.querySelector('.toast');if(existing)existing.remove();
+  const t=document.createElement('div');t.className='toast';t.textContent=msg;
+  document.getElementById('app').appendChild(t);
+  clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>t.remove(),2500);
+}
+
+// Clock
+function updateClock(){
+  const now=new Date();
+  document.getElementById('clock').textContent=now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true}).replace(' ','');
+}
+
+// ══════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════
+load();
+applyTheme();
+if(D.user.accentColor)document.querySelector('.phone').style.setProperty('--primary',D.user.accentColor);
+// Daily login XP
+if(D.user.lastStudyDate!==todayStr()){addXP(5);showToast('👋 Welcome back! +5 XP');}
+updateClock();setInterval(updateClock,30000);
+renderPage();
+</script>
+</body>
+</html>
